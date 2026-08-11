@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IoT Monitor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="login-screen" style="display:none">
+  <div class="login-bg">
+    <div class="grid-lines"></div>
+    <div class="pulse-rings">
+      <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+    </div>
+  </div>
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#00d4ff" stroke-width="2"/><circle cx="20" cy="20" r="6" fill="#00d4ff"/><line x1="20" y1="2" x2="20" y2="10" stroke="#00d4ff" stroke-width="2"/><line x1="20" y1="30" x2="20" y2="38" stroke="#00d4ff" stroke-width="2"/><line x1="2" y1="20" x2="10" y2="20" stroke="#00d4ff" stroke-width="2"/><line x1="30" y1="20" x2="38" y2="20" stroke="#00d4ff" stroke-width="2"/></svg>
+      <span>IoT<strong>Monitor</strong></span>
+    </div>
+    <h2>Acesso ao Sistema</h2>
+    <p class="login-sub">Insira suas credenciais para continuar</p>
+    <form id="login-form">
+      <div class="field-group">
+        <label>Usuário</label>
+        <input type="text" id="login-user" placeholder="usuario" autocomplete="username" required>
+      </div>
+      <div class="field-group">
+        <label>Senha</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <div id="login-error" class="login-error"></div>
+      <button type="submit" class="btn-primary" id="login-btn">Entrar</button>
+    </form>
+    <p class="login-footer">Acesso restrito — sistema monitorado</p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="app hidden">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#00d4ff" stroke-width="2"/><circle cx="20" cy="20" r="6" fill="#00d4ff"/><line x1="20" y1="2" x2="20" y2="10" stroke="#00d4ff" stroke-width="2"/><line x1="20" y1="30" x2="20" y2="38" stroke="#00d4ff" stroke-width="2"/><line x1="2" y1="20" x2="10" y2="20" stroke="#00d4ff" stroke-width="2"/><line x1="30" y1="20" x2="38" y2="20" stroke="#00d4ff" stroke-width="2"/></svg>
+        <span class="logo-text">IoT<strong>Monitor</strong></span>
+      </div>
+      <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <a href="#" class="nav-item active" data-page="dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-page="sensors">
+        <svg class="nav-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Sensores</span>
+      </a>
+      <a href="#" class="nav-item" data-page="devices">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+        <span>Dispositivos</span>
+      </a>
+      <a href="#" class="nav-item" data-page="alerts">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span>Alertas</span>
+        <span class="badge" id="alert-badge" style="display:none">0</span>
+      </a>
+    </div>
+
+    <!-- Seção admin -->
+    <div class="nav-section" id="admin-section" style="display:none">
+      <div class="nav-label">Administração</div>
+      <a href="#" class="nav-item" data-page="customers">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Clientes</span>
+      </a>
+      <a href="#" class="nav-item" data-page="users">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Usuários</span>
+      </a>
+      <a href="#" class="nav-item" data-page="audit">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Auditoria</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="connection-status">
+        <span class="status-dot" id="ws-dot"></span>
+        <span id="ws-label">Desconectado</span>
+      </div>
+      <div class="user-info">
+        <span id="sidebar-username"></span>
+        <button class="btn-icon" onclick="logout()" title="Sair">⏻</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="main-content">
+    <header class="top-bar">
+      <button class="mobile-menu-btn" id="mobile-menu">☰</button>
+      <div class="page-title" id="page-title">Dashboard</div>
+      <div class="top-bar-right">
+        <div class="time-display" id="clock"></div>
+        <button class="btn-icon" onclick="showPage('alerts')" title="Alertas">🔔</button>
+        <button class="btn-sm" onclick="showChangePassword()">⚙ Senha</button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div class="stat-grid" id="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📡</div>
+          <div class="stat-info"><div class="stat-value" id="stat-devices">--</div><div class="stat-label">Dispositivos</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🌡️</div>
+          <div class="stat-info"><div class="stat-value" id="stat-readings">--</div><div class="stat-label">Tópicos Ativos</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-info"><div class="stat-value" id="stat-alerts">--</div><div class="stat-label">Alertas Ativos</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔗</div>
+          <div class="stat-info"><div class="stat-value" id="stat-topics">--</div><div class="stat-label">Tópicos MQTT</div></div>
+        </div>
+      </div>
+
+      <div class="admin-dashboard hidden" id="admin-dashboard">
+        <div class="admin-browser">
+          <div class="admin-browser-head">
+            <h3>Clientes e ESPs</h3>
+            <button class="btn-sm" onclick="clearAdminDashboardFilter()">Todos</button>
+          </div>
+          <div class="admin-browser-list" id="admin-browser-list"></div>
+        </div>
+      </div>
+
+      <div class="period-bar">
+        <span class="period-label">Período:</span>
+        <div class="period-btns">
+          <button class="period-btn active" data-p="1h">1H</button>
+          <button class="period-btn" data-p="6h">6H</button>
+          <button class="period-btn" data-p="24h">24H</button>
+          <button class="period-btn" data-p="7d">7D</button>
+        </div>
+        <button class="btn-sm" onclick="addPanel()">+ Painel</button>
+      </div>
+
+      <div class="panels-grid" id="panels-grid">
+        <div class="panel empty-panel" id="empty-hint">
+          <div class="empty-icon">📊</div>
+          <p>Nenhum painel configurado</p>
+          <p class="empty-sub">Clique em <strong>+ Painel</strong> para adicionar um gráfico ou aguarde dados chegarem via MQTT</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SENSORS PAGE -->
+    <div class="page" id="page-sensors">
+      <div class="page-header">
+        <h2>Sensores em Tempo Real</h2>
+        <div class="search-box">
+          <input type="text" id="sensor-search" placeholder="Filtrar tópico..." oninput="filterSensors()">
+        </div>
+      </div>
+      <div class="sensor-list" id="sensor-list">
+        <div class="loading-text">Aguardando dados...</div>
+      </div>
+    </div>
+
+    <!-- DEVICES PAGE -->
+    <div class="page" id="page-devices">
+      <div class="page-header">
+        <h2>Dispositivos ESP32</h2>
+        <button class="btn-primary" id="btn-add-device" onclick="showAddDevice()" style="display:none">+ Novo Dispositivo</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="devices-table">
+          <thead><tr><th>Nome</th><th>Tópico</th><th>Cliente</th><th>Descrição</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="devices-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALERTS PAGE -->
+    <div class="page" id="page-alerts">
+      <div class="page-header">
+        <h2>Alertas</h2>
+        <button class="btn-primary" id="btn-add-alert" onclick="showAddAlert()" style="display:none">+ Novo Alerta</button>
+      </div>
+      <div id="active-alerts" class="alerts-stream"></div>
+      <h3 style="margin:24px 0 12px;color:var(--text-muted)">Regras de Alertas</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Dispositivo</th><th>Sensor</th><th>Condição</th><th>Valor</th><th>Mensagem</th><th>Ações</th></tr></thead>
+          <tbody id="alerts-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS PAGE (admin only) -->
+    <div class="page" id="page-customers">
+      <div class="page-header">
+        <h2>Gerenciar Clientes</h2>
+        <button class="btn-primary" onclick="showAddCustomer()">+ Novo Cliente</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Observações</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="customers-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS PAGE -->
+    <div class="page" id="page-users">
+      <div class="page-header">
+        <h2>Gerenciar Usuários</h2>
+        <button class="btn-primary" onclick="showAddUser()">+ Novo Usuário</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Usuário</th><th>Perfil</th><th>Cliente</th><th>Criado em</th><th>Último acesso</th><th>Ações</th></tr></thead>
+          <tbody id="users-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AUDIT PAGE -->
+    <div class="page" id="page-audit">
+      <div class="page-header">
+        <h2>Log de Auditoria</h2>
+        <button class="btn-sm" onclick="loadAudit()">↻ Atualizar</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th><th>Detalhes</th><th>IP</th></tr></thead>
+          <tbody id="audit-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+  <div class="modal" id="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="modal-title">Modal</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toasts"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
